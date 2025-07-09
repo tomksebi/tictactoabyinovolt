@@ -2,14 +2,168 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tic Tac Toe - Thunder</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Team Page + Tic Tac Toe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 5px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: white;
+      font-size: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
-<body>
-  <h1>Tic Tac Toe ⚡</h1>
-  <div id="board" class="board"></div>
-  <p id="status">Your Turn</p>
-  <button onclick="restartGame()">Restart</button>
-  <script src="script.js"></script>
+<body class="bg-gray-100">
+
+<!-- Header with Logo -->
+<header class="bg-blue-600 text-white py-6 shadow-md">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-6">
+    <div class="flex items-center gap-4">
+      <img src="https://i.ibb.co/7t5wh6JB/181f051f-13a4-415e-a1ff-ec4ca0c159f7.png" width="100px">
+      <div>
+        <h3 class="text-3xl font-bold">Meet Our Team</h3>
+        <p class="text-lg">The people who make everything possible</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Team Section -->
+<section class="max-w-7xl mx-auto px-6 py-12">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    <div class="text-center">
+      <img class="w-32 h-32 mx-auto rounded-full object-cover" src="https://i.ibb.co/xSBqSJkp/ragunandhan.jpg">
+      <h2 class="text-xl font-semibold mt-4">Raghunandan S</h2>
+      <p class="text-gray-600">Captain</p>
+    </div>
+  </div>
+
+  <!-- Tic Tac Toe Trigger -->
+  <div class="text-center mt-12">
+    <button onclick="openModal()" class="bg-purple-600 text-white px-6 py-3 rounded-full text-lg shadow-md hover:bg-purple-700">
+      🎮 Play Tic Tac Toe
+    </button>
+  </div>
+</section>
+
+<!-- Modal -->
+<div id="gameModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-lg p-6 w-[360px] relative">
+    <button onclick="closeModal()" class="absolute top-2 right-2 text-xl font-bold">×</button>
+    <h2 class="text-xl font-bold text-center">Tic Tac Toe ⚡</h2>
+    <div id="board" class="board mt-4"></div>
+    <p id="status" class="text-center mt-2 font-semibold">Your Turn</p>
+    <button onclick="restartGame()" class="block mx-auto mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Restart</button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-green-600 text-white text-center py-6 mt-12">
+  <p>© 2025 Team One | All rights reserved</p>
+</footer>
+
+<!-- JS -->
+<script>
+  const board = document.getElementById("board");
+  const statusText = document.getElementById("status");
+  const modal = document.getElementById("gameModal");
+
+  let cells = [];
+  let boardState = Array(9).fill(null);
+  let isGameOver = false;
+
+  function createBoard() {
+    board.innerHTML = '';
+    cells = [];
+    boardState = Array(9).fill(null);
+    isGameOver = false;
+    statusText.textContent = "Your Turn";
+
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.dataset.index = i;
+      cell.addEventListener("click", playerMove);
+      board.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+
+  function playerMove(e) {
+    const index = e.target.dataset.index;
+    if (boardState[index] || isGameOver) return;
+
+    boardState[index] = "⚡";
+    cells[index].textContent = "⚡";
+    if (checkGameEnd()) return;
+
+    setTimeout(aiMove, 500);
+  }
+
+  function aiMove() {
+    const emptyIndices = boardState
+      .map((v, i) => (v === null ? i : null))
+      .filter(v => v !== null);
+
+    if (emptyIndices.length === 0) return;
+
+    const aiChoice = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+    boardState[aiChoice] = "O";
+    cells[aiChoice].textContent = "O";
+
+    checkGameEnd();
+  }
+
+  function checkGameEnd() {
+    const winPatterns = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    for (let pattern of winPatterns) {
+      const [a, b, c] = pattern;
+      if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+        statusText.textContent = `${boardState[a]} Wins!`;
+        isGameOver = true;
+        return true;
+      }
+    }
+
+    if (!boardState.includes(null)) {
+      statusText.textContent = "Draw!";
+      isGameOver = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  function restartGame() {
+    createBoard();
+  }
+
+  function openModal() {
+    modal.classList.remove("hidden");
+    createBoard();
+  }
+
+  function closeModal() {
+    modal.classList.add("hidden");
+  }
+</script>
+
 </body>
 </html>
